@@ -25,23 +25,83 @@ const wss = new SocketServer({ server: server });
 //     });
 // };
 
+function randomColor() {
+  const num = Math.floor(Math.random() * 4 + 1);
+    switch(num){
+        case 1:
+        return 'red';
+            break;
+        case 2:
+        return 'blue';
+            break;
+        case 3:
+        return 'green';
+            break;
+        case 4:
+        return 'yellow';
+            break;
+    }
+}
+
+var userCount = 0;
 
 wss.on('connection', (ws) => {
   console.log('Client connected');
+  userCount += 1;
+    let color = randomColor();
+    let newColor = {randomColor: color, type: "incomingColor"};
+    number = {type: "connectedUsers", userCount: userCount};
+    wss.clients.forEach(function each(client) {
+        if (client.readyState === WebSockets.OPEN) {
+            client.send(JSON.stringify(number));
+        }
+    });
+
+    ws.send(JSON.stringify(newColor));
+
 
   ws.on('message', function incoming(message) {
-    let data = JSON.parse(message);
+    const data = JSON.parse(message);
     data.id = nodeUuid.v1();
-    console.log(`User ${data.username} said ${data.content}`);
-    console.log(data)
-    wss.clients.forEach(function each(client) {
-        // if (client.readyState === WebSockets.OPEN) {
-            client.send(JSON.stringify(data))
-        // }
-    });
+    switch(data.type) {
+        case "postMessage":
+        data.type = "incomingMessage"
+            wss.clients.forEach(function each(client) {
+            if (client.readyState === WebSockets.OPEN) {
+                client.send(JSON.stringify(data))
+            }
+        });
+            break;
+        case "postNotification":
+        data.type = "incomingNotification";
+        data.content = `User ${data.oldUserName} changed their name to ${data.username}`;
+            wss.clients.forEach(function each(client) {
+            if (client.readyState === WebSockets.OPEN) {
+                client.send(JSON.stringify(data))
+            }
+        });
+            break;
+            default:
+            throw new err ("error" + data.type);
+    }
+
   });
 
 
   // Set up a callback for when a client closes the socket. This usually means they closed their browser.
-  ws.on('close', () => console.log('Client disconnected'));
+  ws.on('close', () => {
+    console.log('Client disconnected');
+    userCount -= 1
+
+    number = {type: "connectedUsers", userCount: userCount}
+    wss.clients.forEach(function each(client) {
+        if (client.readyState === WebSockets.OPEN) {
+            client.send(JSON.stringify(number));
+        }
+    });
+
+  });
+
 });
+
+

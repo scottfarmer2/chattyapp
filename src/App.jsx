@@ -6,8 +6,9 @@ class App extends Component {
     constructor(props) {
         super(props);
         this.state = {
-
-            currentUser: {},
+            color: {color: "black"},
+            userCount: 0,
+            currentUser: {username: "Anonymous"},
             messages: []
         }
     }
@@ -17,25 +18,37 @@ class App extends Component {
         this.socket = new WebSocket("ws://localhost:3001");
         this.socket.onopen = (event) => {
             console.log('Connect to server');
+
         };
          this.socket.onmessage = (event) => {
-            console.log("incoming messages", JSON.parse(event.data));
             let newData = JSON.parse(event.data);
+            console.log(newData);
+            if (newData.type === "connectedUsers") {
+                console.log(newData.userCount)
+                this.setState({userCount: newData.userCount});
+            } else if (newData.type === "incomingColor") {
+                this.setState({color: {color:newData.color}})
+            } else {
             let newChat = this.state.messages.concat(newData);
             this.setState({messages: newChat});
-            console.log(this.state);
+            }
+            }
+            console.log("regjeafbjhbsdjvfkhwvchwv", this.state);
             // this.state.data.messages
         }
-    }
+
 
     updateUsername (e) {
         if (e.keyCode === 13) {
             const user = {
-                username: e.target.value
+                type: "postNotification",
+                username: e.target.value,
+                oldUserName: this.state.currentUser["username"]
             }
             console.log(user);
 
         this.setState({currentUser: user})
+        this.socket.send(JSON.stringify(user));
         }
     }
 
@@ -45,7 +58,7 @@ class App extends Component {
            // this.state.currentid.id += 1;
             const newMessage = {
 
-                // id: this.state.currentid.id,
+                type : "postMessage",
                 username: this.state.currentUser.username,
                 content: e.target.value
             }
@@ -64,9 +77,9 @@ class App extends Component {
         return (
             <div className="wrapper">
                 <nav>
-                    <h1>Chatty</h1>
+                    <h1>Chatty</h1><span>{this.state.userCount} users online</span>
                 </nav>
-                <MessageList messages={this.state.messages} />
+                <MessageList messages={this.state.messages} color={this.state.color} />
                 <ChatBar updateUsername={this.updateUsername.bind(this)} newMessage={this.newMessage.bind(this)}  />
             </div>
         );
