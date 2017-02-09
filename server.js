@@ -3,11 +3,7 @@ var WebpackDevServer = require('webpack-dev-server');
 var config = require('./webpack.config');
 
 new WebpackDevServer(webpack(config), {
-    publicPath: config.output.publicPath,
-    watchOptions: {
-      aggregateTimeout: 300,
-      poll: 1000
-    }
+    publicPath: config.output.publicPath
   })
   .listen(3000, '0.0.0.0', function (err, result) {
     if (err) {
@@ -16,3 +12,5 @@ new WebpackDevServer(webpack(config), {
 
     console.log('Running at http://0.0.0.0:3000');
   });
+
+
