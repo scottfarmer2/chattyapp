@@ -49,8 +49,8 @@ wss.on('connection', (ws) => {
   console.log('Client connected');
   userCount += 1;
     let color = randomColor();
-    let newColor = {randomColor: color, type: "incomingColor"};
-    number = {type: "connectedUsers", userCount: userCount};
+    let newColor = {color: color, type: "incomingColor"};
+    let number = {type: "connectedUsers", userCount: userCount};
     wss.clients.forEach(function each(client) {
         if (client.readyState === WebSockets.OPEN) {
             client.send(JSON.stringify(number));
@@ -66,6 +66,7 @@ wss.on('connection', (ws) => {
     switch(data.type) {
         case "postMessage":
         data.type = "incomingMessage"
+        console.log("this is daata:", data);
             wss.clients.forEach(function each(client) {
             if (client.readyState === WebSockets.OPEN) {
                 client.send(JSON.stringify(data))

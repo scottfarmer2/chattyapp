@@ -27,9 +27,14 @@ class App extends Component {
                 console.log(newData.userCount)
                 this.setState({userCount: newData.userCount});
             } else if (newData.type === "incomingColor") {
-                this.setState({color: {color:newData.color}})
-            } else {
+                this.setState({color: {color: newData.color}})
+                console.log("this state", this.state);
+            } else if (newData.type === "incomingMessage") {
+
             let newChat = this.state.messages.concat(newData);
+            this.setState({messages: newChat, color: newData.color});
+            } else if (newData.type === "incomingNotification") {
+             let newChat = this.state.messages.concat(newData);
             this.setState({messages: newChat});
             }
             }
@@ -58,12 +63,13 @@ class App extends Component {
            // this.state.currentid.id += 1;
             const newMessage = {
 
+                color: this.state.color,
                 type : "postMessage",
                 username: this.state.currentUser.username,
                 content: e.target.value
             }
 
-            console.log(newMessage)
+            console.log("hhhhhhhhhhhhhhhhhh", this.state);
             // const message = this.state.messages.concat(newMessage);
             // this.setState({messages: message});
             this.socket.send(JSON.stringify(newMessage));
@@ -79,10 +85,14 @@ class App extends Component {
                 <nav>
                     <h1>Chatty</h1><span>{this.state.userCount} users online</span>
                 </nav>
-                <MessageList messages={this.state.messages} color={this.state.color} />
+                <MessageList messages={this.state.messages} />
                 <ChatBar updateUsername={this.updateUsername.bind(this)} newMessage={this.newMessage.bind(this)}  />
             </div>
         );
       }
+    componentDidUpdate() {
+        var objDiv = document.getElementById("message-list");
+        objDiv.scrollTop = objDiv.scrollHeight;
+    }
 }
 export default App;

@@ -5,10 +5,12 @@ import Notification from './Notification.jsx';
 
 class MessageList extends Component {
   render() {
+
     let messageComponents = this.props.messages.map((item) => {
         switch(item.type) {
             case "incomingMessage":
-            return <Message key={item.id} username={item.username} content={item.content} color={this.props.color} />;
+            console.log("COLOR", item.color);
+            return <Message key={item.id} username={item.username} content={item.content} color={item.color} />;
                 break;
             case "incomingNotification":
             return <Notification key={item.id} content={item.content} />;
