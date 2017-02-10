@@ -9,7 +9,6 @@ class MessageList extends Component {
     let messageComponents = this.props.messages.map((item) => {
         switch(item.type) {
             case "incomingMessage":
-            console.log("COLOR", item.color);
             return <Message key={item.id} username={item.username} content={item.content} color={item.color} />;
                 break;
             case "incomingNotification":

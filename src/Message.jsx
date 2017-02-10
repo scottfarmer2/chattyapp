@@ -3,7 +3,6 @@ import React, {Component} from 'react';
 
 class Message extends Component {
   render() {
-    console.log("color", this.props.color)
     return (
         <div>
             <div className="message">
